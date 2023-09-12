@@ -4,15 +4,65 @@ Este script Bash interativo permite que você escolha um cluster ECS, um serviç
 
 ## Pré-requisitos
 
-- [AWS Command Line Interface (CLI)](https://aws.amazon.com/cli/)
-- [jq](https://stedolan.github.io/jq/) (um processador JSON de linha de comando)
+Antes de usar o script, certifique-se de ter o seguinte instalado em seu sistema:
 
-Certifique-se de que você configurou a AWS CLI com suas credenciais e região AWS corretas antes de usar o script.
+1. **AWS CLI**: Certifique-se de que a AWS CLI esteja instalada e configurada com as credenciais e região corretas. Você pode instalá-la seguindo as [instruções da AWS](https://aws.amazon.com/cli/).
+
+2. **jq**: O script faz uso do utilitário `jq` para processar saídas JSON. Você pode instalá-lo no macOS ou na maioria das distribuições Linux usando o gerenciador de pacotes. Exemplo para o macOS com o Homebrew:
+
+    ```bash
+    brew install jq
+    ```
+
+    Exemplo para sistemas Linux com apt:
+
+    ```bash
+    sudo apt-get install jq
+    ```
 
 ## Como Usar
+Para usar o script de gerenciamento de tasks ECS de forma global, siga os passos abaixo:
 
-1. Clone o repositório:
+1. Clone o repositório
 
-   ```bash
-   git@github.com:kleytonmr/ecs-task-management.git
+    ```bash
+    git@github.com:kleytonmr/ecs-task-management.git
+    ```
+
+2. Navegue até o Diretórioa
+
+    ```bash
+    cd ecs-task-management
+    ```
+
+3. Tornar o Script Executável
+Para macOS/Linux
+
+    ```bash
+    chmod +x ecs_tasks.sh
+    ```
+
+4. Adicionar ao PATH
+Para tornar o script visível em todo o sistema e executável de qualquer diretório, adicione-o ao seu diretório bin pessoal. Certifique-se de que o diretório bin esteja incluído no seu PATH.
+
+	a. Encontre o Diretório `bin` Pessoal
+
+	Você pode encontrar o diretório bin pessoal executando o seguinte comando no terminal:
+
+    ```bash
+    echo $HOME/bin
+    ```
+
+	b. Copie o Script para o Diretório `bin`
+
+    ```bash
+    cp ecs_tasks.sh ~/bin/
+    ```
+
+5. Teste o Comando Global
+Agora, você pode executar o script de qualquer diretório sem precisar especificar o caminho completo. Por exemplo:
+
+    ```bash
+    ecs_tasks.sh
+    ```
 
