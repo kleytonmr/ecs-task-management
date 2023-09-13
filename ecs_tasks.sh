@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "Escolha um perfil AWS:"
+
 # Lista todos os perfis AWS configurados
 profiles=($(aws configure list-profiles))
 
@@ -12,6 +14,11 @@ do
     echo "Escolha um perfil válido."
   fi
 done
+
+# Limpa a tela antes de listar os clusters
+clear
+
+echo "Escolha um cluster:"
 
 # Lista todos os clusters disponíveis no perfil escolhido
 clusters=($(aws ecs list-clusters --profile $profile | jq -r '.clusterArns[] | split("/") | last'))
@@ -26,6 +33,11 @@ do
   fi
 done
 
+# Limpa a tela antes de listar os serviços
+clear
+
+echo "Escolha um serviço:"
+
 # Lista todos os serviços no cluster escolhido
 services=($(aws ecs list-services --cluster $cluster_name --profile $profile | jq -r '.serviceArns[] | split("/") | last'))
 
@@ -39,8 +51,19 @@ do
   fi
 done
 
+# Limpa a tela antes de listar as tasks
+clear
+
 # Lista todas as tasks do serviço escolhido
 tasks=($(aws ecs list-tasks --cluster $cluster_name --service-name $service_name --profile $profile | jq -r '.taskArns[]'))
+
+# Verifica se a lista de tasks está vazia
+if [ ${#tasks[@]} -eq 0 ]; then
+  echo "Não há tasks ativas para o serviço selecionado."
+  exit 1  # Opcional: Encerra o script com um código de saída não zero
+fi
+
+echo "Escolha uma task_id:"
 
 # Exibe a lista de tasks e solicita a escolha da task
 select task_arn in "${tasks[@]}"
