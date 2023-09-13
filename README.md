@@ -6,7 +6,7 @@ Este script Bash interativo permite que você escolha um cluster ECS, um serviç
 
 Antes de usar o script, certifique-se de ter o seguinte instalado em seu sistema:
 
-1. **AWS CLI**: Certifique-se de que a AWS CLI esteja instalada e configurada com as credenciais e região corretas. Você pode instalá-la seguindo as [instruções da AWS](https://aws.amazon.com/cli/).
+1. **AWS CLI**: Certifique-se de que a AWS CLI esteja instalada e configurada com as credenciais e região corretas. Você pode instalá-la seguindo as [instruções da AWS](https://aws.amazon.com/cli/). Bonus: [How to set up AWS CLI with AWS Single Sign-On (SSO)](https://medium.com/@pushkarjoshi0410/how-to-set-up-aws-cli-with-aws-single-sign-on-sso-acf4dd88e056).
 
 2. **jq**: O script faz uso do utilitário `jq` para processar saídas JSON. Você pode instalá-lo no macOS ou na maioria das distribuições Linux usando o gerenciador de pacotes. Exemplo para o macOS com o Homebrew:
 
