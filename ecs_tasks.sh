@@ -1,20 +1,8 @@
+
 #!/bin/bash
 
-# Lista todos os perfis AWS configurados
-profiles=($(aws configure list-profiles))
-
-# Exibe a lista de perfis e solicita a escolha de um perfil
-select profile in "${profiles[@]}"
-do
-  if [ -n "$profile" ]; then
-    break
-  else
-    echo "Escolha um perfil válido."
-  fi
-done
-
-# Lista todos os clusters disponíveis no perfil escolhido
-clusters=($(aws ecs list-clusters --profile $profile | jq -r '.clusterArns[] | split("/") | last'))
+# Lista todos os clusters disponíveis
+clusters=($(aws ecs list-clusters | jq -r '.clusterArns[] | split("/") | last'))
 
 # Exibe a lista de clusters e solicita a escolha do cluster
 select cluster_name in "${clusters[@]}"
@@ -27,7 +15,7 @@ do
 done
 
 # Lista todos os serviços no cluster escolhido
-services=($(aws ecs list-services --cluster $cluster_name --profile $profile | jq -r '.serviceArns[] | split("/") | last'))
+services=($(aws ecs list-services --cluster $cluster_name | jq -r '.serviceArns[] | split("/") | last'))
 
 # Exibe a lista de serviços e solicita a escolha do serviço
 select service_name in "${services[@]}"
@@ -40,7 +28,7 @@ do
 done
 
 # Lista todas as tasks do serviço escolhido
-tasks=($(aws ecs list-tasks --cluster $cluster_name --service-name $service_name --profile $profile | jq -r '.taskArns[]'))
+tasks=($(aws ecs list-tasks --cluster $cluster_name --service-name $service_name | jq -r '.taskArns[]'))
 
 # Exibe a lista de tasks e solicita a escolha da task
 select task_arn in "${tasks[@]}"
@@ -59,7 +47,7 @@ do
       --task $task_id \
       --container bioritmo-smart-system \
       --command 'launcher bash' \
-      --interactive --profile $profile
+      --interactive
 
     break
   else
