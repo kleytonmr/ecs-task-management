@@ -1,26 +1,77 @@
 #!/bin/bash
 
-echo "Escolha um perfil AWS:"
-
-# Lista todos os perfis AWS configurados
-profiles=($(aws configure list-profiles))
+# Função para listar os perfis
+list_profiles() {
+  profiles=($(aws configure list-profiles))
+  echo -e "Escolha um perfil AWS:n\n"
+  echo "0) Novo perfil (aws configure sso)"
+}
 
 # Exibe a lista de perfis e solicita a escolha de um perfil
-select profile in "${profiles[@]}"
-do
-  if [ -n "$profile" ]; then
-    break
-  else
-    echo "Escolha um perfil válido."
-  fi
+while true; do
+  list_profiles
+  select profile in "${profiles[@]}"
+  do
+    if [ "$REPLY" -eq 0 ]; then
+      aws configure sso
+      clear
+      break
+    elif [ -n "$profile" ]; then
+      break 2
+    else
+      echo "Escolha um perfil válido."
+    fi
+  done
 done
 
 # Limpa a tela antes de listar os clusters
 clear
 
+# Agora você pode usar a variável $profile para acessar o perfil selecionado
+echo "Você selecionou o perfil\n: $profile"
+
 echo "Escolha um cluster:"
 
+# Limpa a tela antes de escolher perfil caso não esteja logado
+clear
+
 # Lista todos os clusters disponíveis no perfil escolhido
+clusters=($(aws ecs list-clusters --profile $profile | jq -r '.clusterArns[] | split("/") | last'))
+
+# Verifica se a lista de clusters está vazia
+if [ ${#clusters[@]} -eq 0 ]; then
+  echo -e "\n"
+  echo "Não foi possível listar os clusters para o perfil selecionado."
+  echo "Escolha uma das opções a seguir:"
+  echo "1. Configurar AWS SSO"
+  echo "2. Fazer login com o perfil escolhido anteriormente"
+  echo "3. Sair"
+  read choice
+  case $choice in
+    1)
+      aws configure sso &
+      wait $!
+      exit 0
+      ;;
+    2)
+      aws sso login --profile $profile &
+      wait $!
+      ;;
+    3)
+      echo "Bye!"
+      exit 1
+      ;;
+    *)
+      echo "Opção inválida."
+      exit 1
+      ;;
+  esac
+fi
+
+# Limpa a tela antes de listar os clusters
+clear
+echo "Escolha um cluster:"
+
 clusters=($(aws ecs list-clusters --profile $profile | jq -r '.clusterArns[] | split("/") | last'))
 
 # Exibe a lista de clusters e solicita a escolha do cluster
