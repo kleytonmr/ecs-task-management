@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Função para listar os perfis
 list_profiles() {
   profiles=($(aws configure list-profiles))
   echo -e "Escolha um perfil AWS:n\n"
@@ -27,7 +26,6 @@ done
 # Limpa a tela antes de listar os clusters
 clear
 
-# Agora você pode usar a variável $profile para acessar o perfil selecionado
 echo "Você selecionou o perfil\n: $profile"
 
 echo "Escolha um cluster:"
@@ -111,7 +109,7 @@ tasks=($(aws ecs list-tasks --cluster $cluster_name --service-name $service_name
 # Verifica se a lista de tasks está vazia
 if [ ${#tasks[@]} -eq 0 ]; then
   echo "Não há tasks ativas para o serviço selecionado."
-  exit 1  # Opcional: Encerra o script com um código de saída não zero
+  exit 1  
 fi
 
 echo "Escolha uma task_id:"
