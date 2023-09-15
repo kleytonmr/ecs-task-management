@@ -26,7 +26,7 @@ Antes de usar o script, certifique-se de ter o seguinte instalado em seu sistema
 brew tap kleytonmr/tap
 brew install ecs-task-management
 ```
-https://github.com/kleytonmr/homebrew-tap#readme
+[Veja mais sobre: homebrew-ecs-task-management](https://github.com/kleytonmr/homebrew-tap#readme)
 
 - Linux/MacOS(without homebrew):
 
