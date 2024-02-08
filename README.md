@@ -21,14 +21,14 @@ Antes de usar o script, certifique-se de ter o seguinte instalado em seu sistema
     ```
 
 ## Como Usar
-- MacOS, siga as instruções:
+- ### MacOS, siga as instruções:
 ```bash
 brew tap kleytonmr/tap
 brew install ecs-task-management
 ```
 [Veja mais sobre: homebrew-ecs-task-management](https://github.com/kleytonmr/homebrew-tap#readme)
 
-- Linux/MacOS(without homebrew):
+- ### Linux/MacOS(without homebrew):
 
 Para usar o script de gerenciamento de tasks ECS de forma global, siga os passos abaixo:
 
