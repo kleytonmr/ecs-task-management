@@ -109,7 +109,7 @@ tasks=($(aws ecs list-tasks --cluster $cluster_name --service-name $service_name
 # Verifica se a lista de tasks está vazia
 if [ ${#tasks[@]} -eq 0 ]; then
   echo "Não há tasks ativas para o serviço selecionado."
-  exit 1  
+  exit 1
 fi
 
 echo "Escolha uma task_id:"
@@ -130,7 +130,7 @@ do
       --cluster $cluster_name \
       --task $task_id \
       --container bioritmo-smart-system \
-      --command 'launcher bash' \
+      --command '/bin/bash' \
       --interactive --profile $profile
 
     break
