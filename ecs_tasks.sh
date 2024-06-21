@@ -2,11 +2,11 @@
 
 list_profiles() {
   profiles=($(aws configure list-profiles))
-  echo -e "Escolha um perfil AWS:n\n"
+  echo -e "Escolha um perfil AWS:\n"
   echo "0) Novo perfil (aws configure sso)"
 }
 
-# Exibe a lista de perfis e solicita a escolha de um perfil
+# Displays the list of profiles/prompts to choose a profile
 while true; do
   list_profiles
   select profile in "${profiles[@]}"
@@ -23,20 +23,15 @@ while true; do
   done
 done
 
-# Limpa a tela antes de listar os clusters
+# Clear the screen before listing clusters
 clear
 
-echo "Você selecionou o perfil\n: $profile"
+echo "Você selecionou o perfil: $profile"
 
-echo "Escolha um cluster:"
-
-# Limpa a tela antes de escolher perfil caso não esteja logado
-clear
-
-# Lista todos os clusters disponíveis no perfil escolhido
+# List all clusters available in the profile
 clusters=($(aws ecs list-clusters --profile $profile | jq -r '.clusterArns[] | split("/") | last'))
 
-# Verifica se a lista de clusters está vazia
+# Check if the cluster list is empty
 if [ ${#clusters[@]} -eq 0 ]; then
   echo -e "\n"
   echo "Não foi possível listar os clusters para o perfil selecionado."
@@ -66,13 +61,11 @@ if [ ${#clusters[@]} -eq 0 ]; then
   esac
 fi
 
-# Limpa a tela antes de listar os clusters
+# Clear the screen before listing clusters
 clear
 echo "Escolha um cluster:"
 
-clusters=($(aws ecs list-clusters --profile $profile | jq -r '.clusterArns[] | split("/") | last'))
-
-# Exibe a lista de clusters e solicita a escolha do cluster
+# Display the list of clusters and ask to choose the cluster
 select cluster_name in "${clusters[@]}"
 do
   if [ -n "$cluster_name" ]; then
@@ -82,15 +75,15 @@ do
   fi
 done
 
-# Limpa a tela antes de listar os serviços
+# Clear the screen before listing services
 clear
 
 echo "Escolha um serviço:"
 
-# Lista todos os serviços no cluster escolhido
+# List all services in the chosen cluster
 services=($(aws ecs list-services --cluster $cluster_name --profile $profile | jq -r '.serviceArns[] | split("/") | last'))
 
-# Exibe a lista de serviços e solicita a escolha do serviço
+# Displays the list of services and asks to choose the service
 select service_name in "${services[@]}"
 do
   if [ -n "$service_name" ]; then
@@ -100,13 +93,13 @@ do
   fi
 done
 
-# Limpa a tela antes de listar as tasks
+# Clear the screen before listing tasks
 clear
 
-# Lista todas as tasks do serviço escolhido
+# List all tasks of the chosen service
 tasks=($(aws ecs list-tasks --cluster $cluster_name --service-name $service_name --profile $profile | jq -r '.taskArns[]'))
 
-# Verifica se a lista de tasks está vazia
+# Check if the task list is empty
 if [ ${#tasks[@]} -eq 0 ]; then
   echo "Não há tasks ativas para o serviço selecionado."
   exit 1
@@ -114,23 +107,22 @@ fi
 
 echo "Escolha uma task_id:"
 
-# Exibe a lista de tasks e solicita a escolha da task
+# Displays the list of tasks and prompts you to choose
 select task_arn in "${tasks[@]}"
 do
   if [ -n "$task_arn" ]; then
     task_id=$(echo $task_arn | awk -F'/' '{print $NF}')
     echo "O ID da task é: $task_id"
 
-    # Extrai o nome do cluster a partir do nome da task
     cluster_name=$(echo $task_arn | awk -F'/' '{print $(NF-1)}')
+    container_name=$(aws ecs describe-tasks --cluster $cluster_name --tasks $task_id --profile $profile | jq -r '.tasks[0].containers[0].name')
 
-    # Executar o comando interativo
     aws ecs execute-command \
       --region us-east-1 \
       --cluster $cluster_name \
       --task $task_id \
-      --container bioritmo-smart-system \
-      --command '/bin/bash' \
+      --container $container_name \ # @gil27, you helped me fix a bug without knowing it. :P
+      --command '/bin/bash' \       # https://github.com/kleytonmr/ecs-task-management/issues/8
       --interactive --profile $profile
 
     break
