@@ -1,44 +1,69 @@
 #!/bin/bash
 
-list_profiles() {
-  profiles=($(aws configure list-profiles))
-  echo -e "Escolha um perfil AWS:\n"
-  echo "0) Novo perfil (aws configure sso)"
+load_translations() {
+  local lang_file="translations/translations_$1.json"
+  if [ ! -f "$lang_file" ]; then
+    echo "Translation file not found!"
+    exit 1
+  fi
+
+  eval "$(jq -r 'to_entries | .[] | "local \(.key)=\(.value|@sh) "' $lang_file)"
 }
 
-# Displays the list of profiles/prompts to choose a profile
+echo "1) Português"
+echo "2) English"
+echo "3) Español"
+read -p "Option: " lang_option
+
+case $lang_option in
+  1)
+    lang="pt"
+    ;;
+  2)
+    lang="en"
+    ;;
+  3)
+    lang="es-419"
+    ;;
+  *)
+    echo "Invalid option"
+    exit 1
+    ;;
+esac
+
+load_translations $lang
+
+list_profiles() {
+  profiles=($(aws configure list-profiles))
+  profiles=("Novo perfil (aws configure sso)" "${profiles[@]}")
+}
+
 while true; do
   list_profiles
-  select profile in "${profiles[@]}"
-  do
-    if [ "$REPLY" -eq 0 ]; then
-      aws configure sso
-      clear
-      break
-    elif [ -n "$profile" ]; then
-      break 2
-    else
-      echo "Escolha um perfil válido."
-    fi
-  done
+  profile=$(printf "%s\n" "${profiles[@]}" | fzf --prompt="$choose_profile: ")
+
+  if [[ "$profile" == "Novo perfil (aws configure sso)" ]]; then
+    aws configure sso
+    clear
+    continue
+  elif [ -n "$profile" ]; then
+    break
+  else
+    echo "$invalid_option"
+  fi
 done
 
-# Clear the screen before listing clusters
 clear
+echo "$you_selected_profile $profile"
 
-echo "Você selecionou o perfil: $profile"
-
-# List all clusters available in the profile
 clusters=($(aws ecs list-clusters --profile $profile | jq -r '.clusterArns[] | split("/") | last'))
 
-# Check if the cluster list is empty
 if [ ${#clusters[@]} -eq 0 ]; then
   echo -e "\n"
-  echo "Não foi possível listar os clusters para o perfil selecionado."
-  echo "Escolha uma das opções a seguir:"
-  echo "1. Configurar AWS SSO"
-  echo "2. Fazer login com o perfil escolhido anteriormente"
-  echo "3. Sair"
+  echo "$no_clusters_found"
+  echo "$configure_sso"
+  echo "$login_previous_profile"
+  echo "$exit"
   read choice
   case $choice in
     1)
@@ -51,83 +76,56 @@ if [ ${#clusters[@]} -eq 0 ]; then
       wait $!
       ;;
     3)
-      echo "Bye!"
+      echo "$bye"
       exit 1
       ;;
     *)
-      echo "Opção inválida."
+      echo "$invalid_option"
       exit 1
       ;;
   esac
 fi
 
-# Clear the screen before listing clusters
 clear
-echo "Escolha um cluster:"
+cluster_name=$(printf "%s\n" "${clusters[@]}" | fzf --prompt="$choose_cluster: ")
 
-# Display the list of clusters and ask to choose the cluster
-select cluster_name in "${clusters[@]}"
-do
-  if [ -n "$cluster_name" ]; then
-    break
-  else
-    echo "Escolha um cluster válido."
-  fi
-done
-
-# Clear the screen before listing services
 clear
-
-echo "Escolha um serviço:"
-
-# List all services in the chosen cluster
 services=($(aws ecs list-services --cluster $cluster_name --profile $profile | jq -r '.serviceArns[] | split("/") | last'))
 
-# Displays the list of services and asks to choose the service
-select service_name in "${services[@]}"
-do
-  if [ -n "$service_name" ]; then
-    break
-  else
-    echo "Escolha um serviço válido."
-  fi
-done
-
-# Clear the screen before listing tasks
-clear
-
-# List all tasks of the chosen service
-tasks=($(aws ecs list-tasks --cluster $cluster_name --service-name $service_name --profile $profile | jq -r '.taskArns[]'))
-
-# Check if the task list is empty
-if [ ${#tasks[@]} -eq 0 ]; then
-  echo "Não há tasks ativas para o serviço selecionado."
+if [ ${#services[@]} -eq 0 ]; then
+  echo "$no_active_tasks"
   exit 1
 fi
 
-echo "Escolha uma task_id:"
+service_name=$(printf "%s\n" "${services[@]}" | fzf --prompt="$choose_service: ")
 
-# Displays the list of tasks and prompts you to choose
-select task_arn in "${tasks[@]}"
-do
-  if [ -n "$task_arn" ]; then
-    task_id=$(echo $task_arn | awk -F'/' '{print $NF}')
-    echo "O ID da task é: $task_id"
+clear
+tasks=($(aws ecs list-tasks --cluster $cluster_name --service-name $service_name --profile $profile | jq -r '.taskArns[]'))
 
-    cluster_name=$(echo $task_arn | awk -F'/' '{print $(NF-1)}')
-    container_name=$(aws ecs describe-tasks --cluster $cluster_name --tasks $task_id --profile $profile | jq -r '.tasks[0].containers[0].name')
+if [ ${#tasks[@]} -eq 0 ]; then
+  echo "$no_active_tasks"
+  exit 1
+fi
 
-    aws ecs execute-command \
-      --region us-east-1 \
-      --cluster $cluster_name \
-      --task $task_id \
-      --container $container_name \ # @gil27, you helped me fix a bug without knowing it. :P
-      --command '/bin/bash' \       # https://github.com/kleytonmr/ecs-task-management/issues/8
-      --interactive --profile $profile
+task_arn=$(printf "%s\n" "${tasks[@]}" | fzf --prompt="$choose_task: ")
 
-    break
-  else
-    echo "Escolha uma task válida."
-  fi
-done
+task_id=$(echo $task_arn | awk -F'/' '{print $NF}')
+echo "$task_id_is $task_id"
 
+cluster_name=$(echo $task_arn | awk -F'/' '{print $(NF-1)}')
+container_name=$(aws ecs describe-tasks --cluster $cluster_name --tasks $task_id --profile $profile | jq -r '.tasks[0].containers[0].name')
+
+execute_command_enabled=$(aws ecs describe-tasks --cluster $cluster_name --tasks $task_id --profile $profile | jq -r '.tasks[0].overrides.containerOverrides[0].command')
+
+if [ -z "$execute_command_enabled" ]; then
+  echo "$execute_command_not_enabled"
+  exit 1
+fi
+
+aws ecs execute-command \
+  --region us-east-1 \
+  --cluster $cluster_name \
+  --task $task_id \
+  --container $container_name \  # @gil27, you helped me fix a bug without knowing it. :P
+  --command '/bin/bash' \        # https://github.com/kleytonmr/ecs-task-management/issues/8
+  --interactive --profile $profile

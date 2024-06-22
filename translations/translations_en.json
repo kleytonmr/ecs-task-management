@@ -1,0 +1,18 @@
+{
+  "choose_profile": "Choose an AWS profile:",
+  "new_profile": "New profile (aws configure sso)",
+  "configure_sso": "Configure AWS SSO",
+  "login_previous_profile": "Log in with the previously chosen profile",
+  "exit": "Exit",
+  "invalid_option": "Invalid option. Please choose a valid one.",
+  "you_selected_profile": "You selected the profile: ",
+  "no_clusters_found": "Unable to list clusters for the selected profile.",
+  "choose_cluster": "Choose a cluster:",
+  "choose_service": "Choose a service:",
+  "no_active_tasks": "There are no active tasks for the selected service.",
+  "choose_task": "Choose a task:",
+  "task_id_is": "The task ID is: ",
+  "choose_valid_task": "Choose a valid task.",
+  "bye": "Goodbye!",
+  "execute_command_not_enabled": "The execute command failed because it was not enabled when the task was run or the agent isn't running. Wait and try again or run a new task with execute command enabled."
+}
