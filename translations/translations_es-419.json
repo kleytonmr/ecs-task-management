@@ -1,0 +1,18 @@
+{
+  "choose_profile": "Elija un perfil de AWS:",
+  "new_profile": "Nuevo perfil (aws configure sso)",
+  "configure_sso": "Configurar AWS SSO",
+  "login_previous_profile": "Iniciar sesión con el perfil elegido anteriormente",
+  "exit": "Salir",
+  "invalid_option": "Opción no válida. Por favor elija una válida.",
+  "you_selected_profile": "Has seleccionado el perfil: ",
+  "no_clusters_found": "No se pudieron listar los clústeres para el perfil seleccionado.",
+  "choose_cluster": "Elija un clúster:",
+  "choose_service": "Elija un servicio:",
+  "no_active_tasks": "No hay tareas activas para el servicio seleccionado.",
+  "choose_task": "Elija una tarea:",
+  "task_id_is": "El ID de la tarea es: ",
+  "choose_valid_task": "Elija una tarea válida.",
+  "bye": "¡Adiós!",
+  "execute_command_not_enabled": "El comando de ejecución falló porque no estaba habilitado cuando se ejecutó la tarea o el agente no está en funcionamiento. Espere e intente de nuevo o ejecute una nueva tarea con el comando de ejecución habilitado."
+}
