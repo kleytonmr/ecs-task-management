@@ -2,11 +2,10 @@
 
 list_profiles() {
   profiles=($(aws configure list-profiles))
-  echo -e "Escolha um perfil AWS:\n"
+  echo -e "Escolha um perfil AWS:n\n"
   echo "0) Novo perfil (aws configure sso)"
 }
 
-# Displays the list of profiles/prompts to choose a profile
 while true; do
   list_profiles
   select profile in "${profiles[@]}"
@@ -23,15 +22,16 @@ while true; do
   done
 done
 
-# Clear the screen before listing clusters
 clear
 
-echo "Você selecionou o perfil: $profile"
+echo "Você selecionou o perfil\n: $profile"
 
-# List all clusters available in the profile
+echo "Escolha um cluster:"
+
+clear
+
 clusters=($(aws ecs list-clusters --profile $profile | jq -r '.clusterArns[] | split("/") | last'))
 
-# Check if the cluster list is empty
 if [ ${#clusters[@]} -eq 0 ]; then
   echo -e "\n"
   echo "Não foi possível listar os clusters para o perfil selecionado."
@@ -61,11 +61,11 @@ if [ ${#clusters[@]} -eq 0 ]; then
   esac
 fi
 
-# Clear the screen before listing clusters
 clear
 echo "Escolha um cluster:"
 
-# Display the list of clusters and ask to choose the cluster
+clusters=($(aws ecs list-clusters --profile $profile | jq -r '.clusterArns[] | split("/") | last'))
+
 select cluster_name in "${clusters[@]}"
 do
   if [ -n "$cluster_name" ]; then
@@ -75,15 +75,12 @@ do
   fi
 done
 
-# Clear the screen before listing services
 clear
 
 echo "Escolha um serviço:"
 
-# List all services in the chosen cluster
 services=($(aws ecs list-services --cluster $cluster_name --profile $profile | jq -r '.serviceArns[] | split("/") | last'))
 
-# Displays the list of services and asks to choose the service
 select service_name in "${services[@]}"
 do
   if [ -n "$service_name" ]; then
@@ -93,13 +90,10 @@ do
   fi
 done
 
-# Clear the screen before listing tasks
 clear
 
-# List all tasks of the chosen service
 tasks=($(aws ecs list-tasks --cluster $cluster_name --service-name $service_name --profile $profile | jq -r '.taskArns[]'))
 
-# Check if the task list is empty
 if [ ${#tasks[@]} -eq 0 ]; then
   echo "Não há tasks ativas para o serviço selecionado."
   exit 1
@@ -107,7 +101,6 @@ fi
 
 echo "Escolha uma task_id:"
 
-# Displays the list of tasks and prompts you to choose
 select task_arn in "${tasks[@]}"
 do
   if [ -n "$task_arn" ]; then
@@ -121,8 +114,8 @@ do
       --region us-east-1 \
       --cluster $cluster_name \
       --task $task_id \
-      --container $container_name \ # @gil27, you helped me fix a bug without knowing it. :P
-      --command '/bin/bash' \       # https://github.com/kleytonmr/ecs-task-management/issues/8
+      --container $container_name \  # @gil27, you helped me fix a bug without knowing it. :P
+      --command '/bin/bash' \        # https://github.com/kleytonmr/ecs-task-management/issues/8
       --interactive --profile $profile
 
     break
@@ -130,4 +123,3 @@ do
     echo "Escolha uma task válida."
   fi
 done
-
