@@ -19,7 +19,16 @@ Antes de usar o script, certifique-se de ter o seguinte instalado em seu sistema
     ```bash
     sudo apt-get install jq
     ```
-
+3. **FZF** [Busca interativa através da lista de itens.](https://github.com/junegunn/fzf) 
+		Instação no Mac OSX
+    ```bash
+    brew install fzf
+    ```
+    Exemplo para sistemas Linux com apt:
+    ```bash
+    sudo apt install fzf
+    ```
+    
 ## Como Usar
 - ### MacOS, siga as instruções:
 ```bash
@@ -52,9 +61,9 @@ Para macOS/Linux
     ```
 
 4. Adicionar ao PATH
-Para tornar o script visível em todo o sistema e executável de qualquer diretório, adicione-o ao seu diretório bin pessoal. Certifique-se de que o diretório bin esteja incluído no seu PATH.
+Para tornar o script visível em todo o sistema e executável de qualquer diretório, adicione-o ao seu diretório *bin*. Certifique-se de que o diretório bin esteja incluído no seu PATH.
 
-	a. Encontre o Diretório `bin` Pessoal
+	a. Encontre o Diretório `bin` 
 
 	Você pode encontrar o diretório bin pessoal executando o seguinte comando no terminal:
 
@@ -65,7 +74,7 @@ Para tornar o script visível em todo o sistema e executável de qualquer diret�
 	b. Copie o Script para o Diretório `bin`
 
     ```bash
-    cp ecs_tasks.sh ~/bin/
+    cp -r /caminho/para/sua/pasta ~/bin/
     ```
 
 5. Teste o Comando Global
@@ -75,3 +84,46 @@ Agora, você pode executar o script de qualquer diretório sem precisar especifi
     ecs_tasks.sh
     ```
 
+### Configurando o Alias para o Script `ecs_tasks.sh`
+
+Se você preferir não mover o script `ecs_tasks.sh` para a pasta `~/bin`, você pode criar um alias no seu arquivo de configuração do shell (`~/.bash_profile` para Bash ou `~/.zshrc` para Zsh). Siga as instruções abaixo:
+
+#### Para Bash:
+
+1. Abra o arquivo `~/.bash_profile` em um editor de texto:
+    ```bash
+    nano ~/.bash_profile
+    ```
+
+2. Adicione a seguinte linha no final do arquivo, substituindo `/caminho/para/sua/pasta` pelo caminho real onde o script `ecs_tasks.sh` está localizado:
+    ```bash
+    alias ecs-task-management='/caminho/para/sua/pasta/ecs_tasks.sh'
+    ```
+
+3. Salve o arquivo e saia do editor (pressione `Ctrl+O` para salvar e `Ctrl+X` para sair).
+
+4. Atualize o `bash_profile`:
+    ```bash
+    source ~/.bash_profile
+    ```
+
+#### Para Zsh:
+
+1. Abra o arquivo `~/.zshrc` em um editor de texto:
+    ```bash
+    nano ~/.zshrc
+    ```
+
+2. Adicione a seguinte linha no final do arquivo, substituindo `/caminho/para/sua/pasta` pelo caminho real onde o script `ecs_tasks.sh` está localizado:
+    ```bash
+    alias ecs-task-management='/caminho/para/sua/pasta/ecs_tasks.sh'
+    ``
+
+3. Salve o arquivo e saia do editor (pressione `Ctrl+O` para salvar e `Ctrl+X` para sair).
+
+4. Atualize o `zshrc`:
+    ```bash
+    source ~/.zshrc
+    ```
+
+Agora você pode executar o script `ecs_tasks.sh` de qualquer lugar no seu terminal simplesmente digitando `ecs-task-management`.
