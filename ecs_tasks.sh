@@ -1,7 +1,7 @@
 #!/bin/bash
 
 load_translations() {
-  local lang_file="translations/translations_$1.json"
+  local lang_file="../translations/translations_$1.json"
   if [ ! -f "$lang_file" ]; then
     echo "Translation file not found!"
     exit 1
