@@ -1,13 +1,31 @@
 #!/bin/bash
 
 load_translations() {
-  local lang_file="../translations/translations_$1.json"
+  local lang_url="$1"
+  local lang_file="/tmp/translation.json"
+
+  curl -s -o "$lang_file" "$lang_url"
+
   if [ ! -f "$lang_file" ]; then
     echo "Translation file not found!"
     exit 1
   fi
 
-  eval "$(jq -r 'to_entries | .[] | "local \(.key)=\(.value|@sh) "' $lang_file)"
+  choose_profile=$(jq -r '.choose_profile' "$lang_file")
+  new_profile=$(jq -r '.new_profile' "$lang_file")
+  configure_sso=$(jq -r '.configure_sso' "$lang_file")
+  login_previous_profile=$(jq -r '.login_previous_profile' "$lang_file")
+  exit=$(jq -r '.exit' "$lang_file")
+  invalid_option=$(jq -r '.invalid_option' "$lang_file")
+  you_selected_profile=$(jq -r '.you_selected_profile' "$lang_file")
+  no_clusters_found=$(jq -r '.no_clusters_found' "$lang_file")
+  choose_cluster=$(jq -r '.choose_cluster' "$lang_file")
+  choose_service=$(jq -r '.choose_service' "$lang_file")
+  no_active_tasks=$(jq -r '.no_active_tasks' "$lang_file")
+  choose_task=$(jq -r '.choose_task' "$lang_file")
+  task_id_is=$(jq -r '.task_id_is' "$lang_file")
+  bye=$(jq -r '.bye' "$lang_file")
+  execute_command_not_enabled=$(jq -r '.execute_command_not_enabled' "$lang_file")
 }
 
 echo "1) Português"
@@ -15,15 +33,17 @@ echo "2) English"
 echo "3) Español"
 read -p "Option: " lang_option
 
+base_url="https://raw.githubusercontent.com/kleytonmr/ecs-task-management/main/translations/translations"
+
 case $lang_option in
   1)
-    lang="pt"
+    lang_url="${base_url}_pt.json"
     ;;
   2)
-    lang="en"
+    lang_url="${base_url}_en.json"
     ;;
   3)
-    lang="es-419"
+    lang_url="${base_url}_419.json"
     ;;
   *)
     echo "Invalid option"
@@ -31,22 +51,32 @@ case $lang_option in
     ;;
 esac
 
-load_translations $lang
+load_translations "$lang_url"
 
 list_profiles() {
   profiles=($(aws configure list-profiles))
-  profiles=("Novo perfil (aws configure sso)" "${profiles[@]}")
+  profiles=("$new_profile" "${profiles[@]}")
+  profiles=("$exit" "${profiles[@]}")
 }
 
 while true; do
   list_profiles
   profile=$(printf "%s\n" "${profiles[@]}" | fzf --prompt="$choose_profile: ")
 
-  if [[ "$profile" == "Novo perfil (aws configure sso)" ]]; then
+  if [[ "$profile" == "$new_profile" ]]; then
     aws configure sso
     clear
     continue
+  elif [[ "$profile" == "$exit" ]]; then
+    clear
+    echo "$bye"
+    exit 1
   elif [ -n "$profile" ]; then
+    # check active session
+    if ! aws sts get-caller-identity --profile $profile > /dev/null 2>&1; then
+      echo "$configure_sso"
+      aws sso login --profile $profile
+    fi
     break
   else
     echo "$invalid_option"
@@ -65,6 +95,7 @@ if [ ${#clusters[@]} -eq 0 ]; then
   echo "$login_previous_profile"
   echo "$exit"
   read choice
+
   case $choice in
     1)
       aws configure sso &
@@ -126,6 +157,6 @@ aws ecs execute-command \
   --region us-east-1 \
   --cluster $cluster_name \
   --task $task_id \
-  --container $container_name \  # @gil27, you helped me fix a bug without knowing it. :P
-  --command '/bin/bash' \        # https://github.com/kleytonmr/ecs-task-management/issues/8
+  --container $container_name \
+  --command '/bin/bash' \
   --interactive --profile $profile
