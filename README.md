@@ -19,7 +19,7 @@ Antes de usar o script, certifique-se de ter o seguinte instalado em seu sistema
     ```bash
     sudo apt-get install jq
     ```
-3. **FZF** [Busca interativa através da lista de itens.](https://github.com/junegunn/fzf) 
+3. **FZF** [Busca interativa através da lista de itens.](https://github.com/junegunn/fzf)
 		Instação no Mac OSX
     ```bash
     brew install fzf
@@ -28,7 +28,7 @@ Antes de usar o script, certifique-se de ter o seguinte instalado em seu sistema
     ```bash
     sudo apt install fzf
     ```
-    
+
 ## Como Usar
 - ### MacOS, siga as instruções:
 ```bash
@@ -63,7 +63,7 @@ Para macOS/Linux
 4. Adicionar ao PATH
 Para tornar o script visível em todo o sistema e executável de qualquer diretório, adicione-o ao seu diretório *bin*. Certifique-se de que o diretório bin esteja incluído no seu PATH.
 
-	a. Encontre o Diretório `bin` 
+	a. Encontre o Diretório `bin`
 
 	Você pode encontrar o diretório bin pessoal executando o seguinte comando no terminal:
 
@@ -92,7 +92,7 @@ Se você preferir não mover o script `ecs_tasks.sh` para a pasta `~/bin`, você
 
 1. Abra o arquivo `~/.bash_profile` em um editor de texto:
     ```bash
-    nano ~/.bash_profile
+    vim ~/.bash_profile
     ```
 
 2. Adicione a seguinte linha no final do arquivo, substituindo `/caminho/para/sua/pasta` pelo caminho real onde o script `ecs_tasks.sh` está localizado:
@@ -111,13 +111,13 @@ Se você preferir não mover o script `ecs_tasks.sh` para a pasta `~/bin`, você
 
 1. Abra o arquivo `~/.zshrc` em um editor de texto:
     ```bash
-    nano ~/.zshrc
+    vim ~/.zshrc
     ```
 
 2. Adicione a seguinte linha no final do arquivo, substituindo `/caminho/para/sua/pasta` pelo caminho real onde o script `ecs_tasks.sh` está localizado:
     ```bash
     alias ecs-task-management='/caminho/para/sua/pasta/ecs_tasks.sh'
-    ``
+    ```
 
 3. Salve o arquivo e saia do editor (pressione `Ctrl+O` para salvar e `Ctrl+X` para sair).
 
