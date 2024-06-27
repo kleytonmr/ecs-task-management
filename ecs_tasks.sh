@@ -157,6 +157,6 @@ aws ecs execute-command \
   --region us-east-1 \
   --cluster $cluster_name \
   --task $task_id \
-  --container $container_name \
-  --command '/bin/bash' \
+  --container $container_name \ # @gil27, you helped me fix a bug without knowing it. :P
+  --command 'launcher bash' \   # https://github.com/kleytonmr/ecs-task-management/issues/8
   --interactive --profile $profile
