@@ -43,7 +43,7 @@ case $lang_option in
     lang_url="${base_url}_en.json"
     ;;
   3)
-    lang_url="${base_url}_419.json"
+    lang_url="${base_url}_es-419.json"
     ;;
   *)
     echo "Invalid option"
@@ -144,11 +144,22 @@ task_id=$(echo $task_arn | awk -F'/' '{print $NF}')
 echo "$task_id_is $task_id"
 
 cluster_name=$(echo $task_arn | awk -F'/' '{print $(NF-1)}')
-container_name=$(aws ecs describe-tasks --cluster $cluster_name --tasks $task_id --profile $profile | jq -r '.tasks[0].containers[0].name')
 
-execute_command_enabled=$(aws ecs describe-tasks --cluster $cluster_name --tasks $task_id --profile $profile | jq -r '.tasks[0].overrides.containerOverrides[0].command')
+container_names=($(aws ecs describe-tasks --cluster $cluster_name --tasks $task_id --profile $profile | jq -r '.tasks[0].containers[].name'))
+container_name=""
 
-if [ -z "$execute_command_enabled" ]; then
+for name in "${container_names[@]}"; do
+  if [[ "$name" != aws-guardduty-agent* ]]; then
+    container_name="$name"
+    break
+  fi
+done
+
+if [ -z "$container_name" ]; then
+  container_name="${container_names[0]}"
+fi
+
+if [ -z "$container_name" ]; then
   echo "$execute_command_not_enabled"
   exit 1
 fi
@@ -157,6 +168,6 @@ aws ecs execute-command \
   --region us-east-1 \
   --cluster $cluster_name \
   --task $task_id \
-  --container $container_name \ # @gil27, you helped me fix a bug without knowing it. :P
-  --command 'launcher bash' \   # https://github.com/kleytonmr/ecs-task-management/issues/8
+  --container $container_name \
+  --command '/bin/bash' \
   --interactive --profile $profile
