@@ -169,5 +169,15 @@ aws ecs execute-command \
   --cluster $cluster_name \
   --task $task_id \
   --container $container_name \
+  --command 'launcher bash' \
+  --interactive --profile $profile
+
+echo $command_execute_error
+
+aws ecs execute-command \
+  --region us-east-1 \
+  --cluster $cluster_name \
+  --task $task_id \
+  --container $container_name \
   --command '/bin/bash' \
   --interactive --profile $profile
