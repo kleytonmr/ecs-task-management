@@ -26,6 +26,7 @@ load_translations() {
   task_id_is=$(jq -r '.task_id_is' "$lang_file")
   bye=$(jq -r '.bye' "$lang_file")
   execute_command_not_enabled=$(jq -r '.execute_command_not_enabled' "$lang_file")
+  command_execute_error=$(jq -r '.command_execute_error' "$lang_file")
 }
 
 echo "1) Português"
@@ -172,7 +173,7 @@ aws ecs execute-command \
   --command 'launcher bash' \
   --interactive --profile $profile
 
-echo $command_execute_error
+echo "$command_execute_error"
 
 aws ecs execute-command \
   --region us-east-1 \
