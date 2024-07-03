@@ -1,4 +1,5 @@
 {
+  "command_execute_error": "Falló la ejecución con el iniciador de bash. Probando con '/bin/bash'...",
   "choose_profile": "Elija un perfil de AWS:",
   "new_profile": "Nuevo perfil (aws configure sso)",
   "configure_sso": "Configurar AWS SSO",
