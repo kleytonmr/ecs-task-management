@@ -25,8 +25,8 @@ load_translations() {
   choose_task=$(jq -r '.choose_task' "$lang_file")
   task_id_is=$(jq -r '.task_id_is' "$lang_file")
   bye=$(jq -r '.bye' "$lang_file")
+  command="command -v launcher && launcher bash || /bin/bash"
   execute_command_not_enabled=$(jq -r '.execute_command_not_enabled' "$lang_file")
-  command_execute_error=$(jq -r '.command_execute_error' "$lang_file")
 }
 
 echo "1) Português"
@@ -170,15 +170,5 @@ aws ecs execute-command \
   --cluster $cluster_name \
   --task $task_id \
   --container $container_name \
-  --command 'launcher bash' \
-  --interactive --profile $profile
-
-echo "$command_execute_error"
-
-aws ecs execute-command \
-  --region us-east-1 \
-  --cluster $cluster_name \
-  --task $task_id \
-  --container $container_name \
-  --command '/bin/bash' \
+  --command $command \
   --interactive --profile $profile
