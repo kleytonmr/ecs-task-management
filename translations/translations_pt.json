@@ -1,5 +1,4 @@
 {
-  "command_execute_error": "Execução com launcher bash falhou. Tentando com '/bin/bash'...",
   "choose_profile": "Escolha um perfil AWS:",
   "new_profile": "Novo perfil (aws configure sso)",
   "configure_sso": "Configurar AWS SSO",

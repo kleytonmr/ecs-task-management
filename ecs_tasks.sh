@@ -27,7 +27,6 @@ load_translations() {
   bye=$(jq -r '.bye' "$lang_file")
   command="command -v launcher && launcher bash || /bin/bash"
   execute_command_not_enabled=$(jq -r '.execute_command_not_enabled' "$lang_file")
-  command_execute_error=$(jq -r '.command_execute_error' "$lang_file")
 }
 
 echo "1) Português"
