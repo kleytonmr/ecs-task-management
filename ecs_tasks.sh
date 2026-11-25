@@ -165,20 +165,12 @@ if [ -z "$container_name" ]; then
   exit 1
 fi
 
+# Escolhe o shell dentro do container em uma única sessão:
+# launcher (imagens buildpack) -> bash -> sh
 aws ecs execute-command \
   --region us-east-1 \
   --cluster $cluster_name \
   --task $task_id \
   --container $container_name \
-  --command 'launcher bash' \
-  --interactive --profile $profile
-
-echo "$command_execute_error"
-
-aws ecs execute-command \
-  --region us-east-1 \
-  --cluster $cluster_name \
-  --task $task_id \
-  --container $container_name \
-  --command '/bin/bash' \
-  --interactive --profile $profile
+  --command "/bin/sh -c 'command -v launcher >/dev/null 2>&1 && exec launcher bash; command -v bash >/dev/null 2>&1 && exec bash; exec sh'" \
+  --interactive --profile $profile || echo "$command_execute_error"
